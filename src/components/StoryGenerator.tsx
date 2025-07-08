@@ -4,43 +4,58 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { generateStory } from '@/utils/geminiAI';
+import { useToast } from '@/hooks/use-toast';
+import APIKeyInput from './APIKeyInput';
 
 const StoryGenerator = () => {
   const [request, setRequest] = useState('');
   const [language, setLanguage] = useState('');
   const [generatedStory, setGeneratedStory] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isApiKeySet, setIsApiKeySet] = useState(false);
+  const { toast } = useToast();
 
   const handleGenerate = async () => {
     if (!request.trim() || !language) return;
     
     setIsGenerating(true);
     
-    // Simulate AI generation for now
-    setTimeout(() => {
-      const sampleStories = {
-        hindi: `🌟 एक छोटी सी चिड़िया की कहानी 🌟
-
-एक बार की बात है, एक छोटी सी चिड़िया थी जिसका नाम चिरप था। चिरप बहुत मेहनती थी और हमेशा अपने दोस्तों की मदद करती थी।
-
-एक दिन जंगल में बारिश आई और चिरप के दोस्त बिल्ली मिल्ली का घर भीग गया। चिरप ने तुरंत अपने सभी दोस्तों को इकट्ठा किया और मिलकर मिल्ली के लिए एक नया घर बनाया।
-
-🌈 सीख: मदद करना हमेशा अच्छा होता है, और दोस्ती सबसे बड़ी संपत्ति है।`,
-        
-        marathi: `🌟 लहान पक्ष्याची कथा 🌟
-
-एकदा एक लहान पक्षी होता ज्याचे नाव चिरप होते. चिरप खूप मेहनती होता आणि नेहमी आपल्या मित्रांची मदत करत असे.
-
-एके दिवशी जंगलात पाऊस पडला आणि चिरपच्या मैत्रिणी मांजर मिल्लीचे घर भिजले. चिरपने लगेच आपल्या सर्व मित्रांना एकत्र केले आणि मिळून मिल्लीसाठी नवीन घर बांधले.
-
-🌈 शिकवण: मदत करणे नेहमी चांगले असते, आणि मैत्री ही सर्वात मोठी संपत्ती आहे.`
-      };
-      
-      const story = sampleStories[language as keyof typeof sampleStories] || sampleStories.hindi;
+    try {
+      const story = await generateStory(request, language);
       setGeneratedStory(story);
+      toast({
+        title: "Story Created! 📖",
+        description: "Your culturally relevant story is ready!",
+      });
+    } catch (error) {
+      console.error('Error generating story:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate story. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedStory);
+    toast({
+      title: "Copied! 📋",
+      description: "Story copied to clipboard",
+    });
+  };
+
+  const handleGenerateAnother = () => {
+    setGeneratedStory('');
+    setRequest('');
+  };
+
+  if (!isApiKeySet) {
+    return <APIKeyInput onKeySet={setIsApiKeySet} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -110,10 +125,10 @@ const StoryGenerator = () => {
               </div>
             </div>
             <div className="mt-4 flex space-x-2">
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300">
+              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleCopy}>
                 📋 Copy / कॉपी करें
               </Button>
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300">
+              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleGenerateAnother}>
                 🔄 Generate Another / दूसरी बनाएं
               </Button>
             </div>

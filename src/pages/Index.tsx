@@ -1,13 +1,16 @@
-
 import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import ToolCard from '@/components/ToolCard';
 import StoryGenerator from '@/components/StoryGenerator';
 import QASupport from '@/components/QASupport';
 import WorksheetGenerator from '@/components/WorksheetGenerator';
+import VisualAidCreator from '@/components/VisualAidCreator';
+import AudioAssessment from '@/components/AudioAssessment';
+import LessonPlanner from '@/components/LessonPlanner';
 
 const Index = () => {
-  const [activeView, setActiveView] = useState<'home' | 'story' | 'qa' | 'worksheet'>('home');
+  const [activeView, setActiveView] = useState<'home' | 'story' | 'qa' | 'worksheet' | 'visual' | 'audio' | 'lesson'>('home');
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -17,6 +20,12 @@ const Index = () => {
         return <QASupport />;
       case 'worksheet':
         return <WorksheetGenerator />;
+      case 'visual':
+        return <VisualAidCreator />;
+      case 'audio':
+        return <AudioAssessment />;
+      case 'lesson':
+        return <LessonPlanner />;
       default:
         return null;
     }
@@ -78,7 +87,6 @@ const Index = () => {
                 emoji="📝"
                 gradient="sage-gradient"
                 onClick={() => setActiveView('worksheet')}
-                comingSoon={true}
               />
               
               <ToolCard
@@ -86,8 +94,7 @@ const Index = () => {
                 description="Generate simple line drawings and diagrams for blackboard teaching"
                 emoji="🎨"
                 gradient="bg-gradient-to-br from-purple-400 to-purple-600"
-                onClick={() => {}}
-                comingSoon={true}
+                onClick={() => setActiveView('visual')}
               />
               
               <ToolCard
@@ -95,8 +102,7 @@ const Index = () => {
                 description="Evaluate student reading fluency with AI-powered speech analysis"
                 emoji="🔊"
                 gradient="bg-gradient-to-br from-blue-400 to-blue-600"
-                onClick={() => {}}
-                comingSoon={true}
+                onClick={() => setActiveView('audio')}
               />
               
               <ToolCard
@@ -104,8 +110,7 @@ const Index = () => {
                 description="Create structured lesson plans aligned with your curriculum goals"
                 emoji="📋"
                 gradient="bg-gradient-to-br from-pink-400 to-pink-600"
-                onClick={() => {}}
-                comingSoon={true}
+                onClick={() => setActiveView('lesson')}
               />
             </div>
 

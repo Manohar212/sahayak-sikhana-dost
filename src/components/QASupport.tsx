@@ -4,51 +4,57 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { generateChildFriendlyAnswer } from '@/utils/geminiAI';
+import { useToast } from '@/hooks/use-toast';
+import APIKeyInput from './APIKeyInput';
 
 const QASupport = () => {
   const [question, setQuestion] = useState('');
   const [language, setLanguage] = useState('');
   const [generatedAnswer, setGeneratedAnswer] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isApiKeySet, setIsApiKeySet] = useState(false);
+  const { toast } = useToast();
 
   const handleGenerate = async () => {
     if (!question.trim() || !language) return;
     
     setIsGenerating(true);
     
-    // Simulate AI generation for now
-    setTimeout(() => {
-      const sampleAnswers = {
-        hindi: `🌈 बच्चों के लिए सरल उत्तर:
-
-आसमान नीला क्यों दिखता है? यह एक बहुत ही दिलचस्प सवाल है!
-
-🌞 सूरज की रोशनी में सभी रंग होते हैं - जैसे इंद्रधनुष में होते हैं!
-🌍 जब यह रोशनी हमारे वायुमंडल में आती है, तो यह हवा के छोटे-छोटे कणों से टकराती है।
-🔵 नीला रंग अन्य रंगों से ज्यादा बिखरता है।
-✨ इसीलिए हमें आसमान नीला दिखाई देता है!
-
-🎯 आसान तरीका समझाने के लिए:
-"जैसे तुम एक प्रिज्म से सूरज की रोशनी को देखते हो और सतरंगी रंग दिखते हैं, वैसे ही आसमान में नीला रंग सबसे ज्यादा दिखता है!"`,
-        
-        marathi: `🌈 मुलांसाठी सोपे उत्तर:
-
-आकाश निळे का दिसते? हा खूप मनोरंजक प्रश्न आहे!
-
-🌞 सूर्याच्या प्रकाशात सर्व रंग असतात - जसे इंद्रधनुष्यात असतात!
-🌍 जेव्हा हा प्रकाश आपल्या वातावरणात येतो, तेव्हा तो हवेतील छोट्या कणांशी टक्कर होतो।
-🔵 निळा रंग इतर रंगांपेक्षा जास्त विखुरतो।
-✨ म्हणूनच आपल्याला आकाश निळे दिसते!
-
-🎯 समजावून सांगण्यासाठी सोपा मार्ग:
-"जसे तुम्ही प्रिझमवरून सूर्याचा प्रकाश पाहता आणि इंद्रधनुषी रंग दिसतात, तसेच आकाशात निळा रंग सर्वात जास्त दिसतो!"`
-      };
-      
-      const answer = sampleAnswers[language as keyof typeof sampleAnswers] || sampleAnswers.hindi;
+    try {
+      const answer = await generateChildFriendlyAnswer(question, language);
       setGeneratedAnswer(answer);
+      toast({
+        title: "Answer Ready! 💡",
+        description: "Child-friendly explanation generated!",
+      });
+    } catch (error) {
+      console.error('Error generating answer:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate answer. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedAnswer);
+    toast({
+      title: "Copied! 📋",
+      description: "Answer copied to clipboard",
+    });
+  };
+
+  const handleAnotherAnswer = () => {
+    setGeneratedAnswer('');
+  };
+
+  if (!isApiKeySet) {
+    return <APIKeyInput onKeySet={setIsApiKeySet} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -118,10 +124,10 @@ const QASupport = () => {
               </div>
             </div>
             <div className="mt-4 flex space-x-2">
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300">
+              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleCopy}>
                 📋 Copy / कॉपी करें  
               </Button>
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300">
+              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleAnotherAnswer}>
                 🔄 Another Answer / दूसरा जवाब
               </Button>
             </div>

@@ -1,31 +1,77 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, User } from 'lucide-react';
+import { Search, User, Sun, Moon } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Navbar = () => {
+  const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <nav className="bg-white border-b border-gray-200 px-6 py-4">
+    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 transition-colors">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-8">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center">
-              <span className="text-white text-sm">✓</span>
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gray-800 dark:bg-white rounded flex items-center justify-center">
+              <span className="text-white dark:text-gray-800 text-sm">✓</span>
             </div>
-            <span className="text-xl font-semibold text-gray-800">Sahayak AI</span>
-          </div>
+            <span className="text-xl font-semibold text-gray-800 dark:text-white">Sahayak AI</span>
+          </Link>
           
           <div className="flex items-center space-x-6">
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Dashboard</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Assignments</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Progress</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 font-medium">Resources</a>
+            <Link 
+              to="/dashboard" 
+              className={`font-medium transition-colors ${
+                isActive('/dashboard') 
+                  ? 'text-primary' 
+                  : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/assignments" 
+              className={`font-medium transition-colors ${
+                isActive('/assignments') 
+                  ? 'text-primary' 
+                  : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Assignments
+            </Link>
+            <Link 
+              to="/progress" 
+              className={`font-medium transition-colors ${
+                isActive('/progress') 
+                  ? 'text-primary' 
+                  : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Progress
+            </Link>
+            <Link 
+              to="/resources" 
+              className={`font-medium transition-colors ${
+                isActive('/resources') 
+                  ? 'text-primary' 
+                  : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              Resources
+            </Link>
           </div>
         </div>
         
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon">
             <Search className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
           </Button>
           <Button variant="ghost" size="icon">
             <User className="h-5 w-5" />

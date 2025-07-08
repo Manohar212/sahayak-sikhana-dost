@@ -6,14 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { generateChildFriendlyAnswer } from '@/utils/geminiAI';
 import { useToast } from '@/hooks/use-toast';
-import APIKeyInput from './APIKeyInput';
+import ContentDownloader from './ContentDownloader';
 
 const QASupport = () => {
   const [question, setQuestion] = useState('');
   const [language, setLanguage] = useState('');
   const [generatedAnswer, setGeneratedAnswer] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isApiKeySet, setIsApiKeySet] = useState(false);
   const { toast } = useToast();
 
   const handleGenerate = async () => {
@@ -52,29 +51,25 @@ const QASupport = () => {
     setGeneratedAnswer('');
   };
 
-  if (!isApiKeySet) {
-    return <APIKeyInput onKeySet={setIsApiKeySet} />;
-  }
-
   return (
     <div className="space-y-6">
-      <Card className="warm-gradient border-earthOrange-200">
+      <Card className="warm-gradient border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-earthOrange-800">
+          <CardTitle className="flex items-center space-x-2 text-blue-800 dark:text-blue-200">
             <span>🧠</span>
             <span>Child-Friendly Q&A Support</span>
           </CardTitle>
-          <CardDescription className="text-earthOrange-600">
+          <CardDescription className="text-blue-600 dark:text-blue-300">
             बच्चों के सवालों के सरल जवाब पाएं • Get simple answers to children's questions
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-earthOrange-800 mb-2">
+            <label className="block text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
               भाषा चुनें • Choose Language
             </label>
             <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="bg-white border-earthOrange-200">
+              <SelectTrigger className="bg-white dark:bg-gray-700 border-blue-200 dark:border-blue-700">
                 <SelectValue placeholder="Select a language / भाषा चुनें" />
               </SelectTrigger>
               <SelectContent>
@@ -88,21 +83,21 @@ const QASupport = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-earthOrange-800 mb-2">
+            <label className="block text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
               बच्चे का सवाल • Child's Question
             </label>
             <Textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="उदाहरण: आसमान नीला क्यों है? / Example: Why is the sky blue?"
-              className="bg-white border-earthOrange-200 min-h-[100px]"
+              className="bg-white dark:bg-gray-700 border-blue-200 dark:border-blue-700 min-h-[100px] text-gray-900 dark:text-white"
             />
           </div>
           
           <Button 
             onClick={handleGenerate}
             disabled={!question.trim() || !language || isGenerating}
-            className="w-full bg-earthOrange-500 hover:bg-earthOrange-600 text-white transition-colors"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white transition-colors"
           >
             {isGenerating ? '🤔 सोच रहे हैं... Thinking...' : '💡 सरल जवाब दें • Get Simple Answer'}
           </Button>
@@ -110,27 +105,42 @@ const QASupport = () => {
       </Card>
 
       {generatedAnswer && (
-        <Card className="bg-white border-sage-200 shadow-lg">
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-sage-800 flex items-center space-x-2">
+            <CardTitle className="text-gray-800 dark:text-gray-200 flex items-center space-x-2">
               <span>💡</span>
               <span>सरल जवाब • Simple Answer</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm max-w-none">
-              <div className="whitespace-pre-line text-gray-700 leading-relaxed">
+              <div className="whitespace-pre-line text-gray-700 dark:text-gray-300 leading-relaxed">
                 {generatedAnswer}
               </div>
             </div>
-            <div className="mt-4 flex space-x-2">
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleCopy}>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600" 
+                onClick={handleCopy}
+              >
                 📋 Copy / कॉपी करें  
               </Button>
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleAnotherAnswer}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600" 
+                onClick={handleAnotherAnswer}
+              >
                 🔄 Another Answer / दूसरा जवाब
               </Button>
             </div>
+            <ContentDownloader 
+              content={generatedAnswer}
+              filename={`qa-answer-${Date.now()}`}
+              type="qa"
+            />
           </CardContent>
         </Card>
       )}

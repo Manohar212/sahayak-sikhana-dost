@@ -1,10 +1,17 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Layout from '@/components/Layout';
+import { generateDashboardData } from '@/utils/geminiAI';
+import { useToast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
+  const [aiInsights, setAiInsights] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
   const studentData = [
     { grade: 'Grade 1', students: 25, avgScore: 78 },
     { grade: 'Grade 2', students: 30, avgScore: 82 },
@@ -27,6 +34,27 @@ const Dashboard = () => {
     { id: 4, activity: 'Generated visual aid for Fractions', time: '1 day ago', type: 'visual' },
   ];
 
+  const generateInsights = async () => {
+    setIsLoading(true);
+    try {
+      const insights = await generateDashboardData();
+      setAiInsights(insights);
+      toast({
+        title: "AI Insights Generated! 🤖",
+        description: "Fresh insights about your teaching data",
+      });
+    } catch (error) {
+      console.error('Error generating insights:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate insights. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -35,10 +63,35 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h1>
             <p className="text-gray-600 dark:text-gray-300">Track your teaching progress and student performance</p>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
-            📊 Generate Report
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              onClick={generateInsights}
+              disabled={isLoading}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              {isLoading ? '🤖 Generating...' : '🤖 AI Insights'}
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90">
+              📊 Generate Report
+            </Button>
+          </div>
         </div>
+
+        {aiInsights && (
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
+            <CardHeader>
+              <CardTitle className="text-blue-800 dark:text-blue-200 flex items-center space-x-2">
+                <span>🤖</span>
+                <span>AI-Generated Insights</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="whitespace-pre-line text-gray-700 dark:text-gray-300 leading-relaxed">
+                {aiInsights}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200">

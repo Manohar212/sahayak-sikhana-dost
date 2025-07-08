@@ -5,14 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { generateWorksheetFromImage } from '@/utils/geminiAI';
 import { useToast } from '@/hooks/use-toast';
-import APIKeyInput from './APIKeyInput';
+import ContentDownloader from './ContentDownloader';
 
 const WorksheetGenerator = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [selectedGrade, setSelectedGrade] = useState('');
   const [generatedWorksheet, setGeneratedWorksheet] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isApiKeySet, setIsApiKeySet] = useState(false);
   const { toast } = useToast();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,29 +67,25 @@ const WorksheetGenerator = () => {
     });
   };
 
-  if (!isApiKeySet) {
-    return <APIKeyInput onKeySet={setIsApiKeySet} />;
-  }
-
   return (
     <div className="space-y-6">
-      <Card className="warm-gradient border-sage-200">
+      <Card className="warm-gradient border-green-200 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-sage-800">
+          <CardTitle className="flex items-center space-x-2 text-green-800 dark:text-green-200">
             <span>📝</span>
             <span>Worksheet Generator</span>
           </CardTitle>
-          <CardDescription className="text-sage-600">
+          <CardDescription className="text-green-600 dark:text-green-300">
             किताब की फोटो से worksheet बनाएं • Create worksheets from textbook photos
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-sage-800 mb-2">
+            <label className="block text-sm font-medium text-green-800 dark:text-green-200 mb-2">
               कक्षा चुनें • Choose Grade
             </label>
             <Select value={selectedGrade} onValueChange={setSelectedGrade}>
-              <SelectTrigger className="bg-white border-sage-200">
+              <SelectTrigger className="bg-white dark:bg-gray-700 border-green-200 dark:border-green-700">
                 <SelectValue placeholder="Select grade / कक्षा चुनें" />
               </SelectTrigger>
               <SelectContent>
@@ -101,7 +96,7 @@ const WorksheetGenerator = () => {
             </Select>
           </div>
 
-          <div className="border-2 border-dashed border-sage-300 rounded-lg p-8 text-center">
+          <div className="border-2 border-dashed border-green-300 dark:border-green-700 rounded-lg p-8 text-center">
             <input
               type="file"
               accept="image/*"
@@ -111,10 +106,10 @@ const WorksheetGenerator = () => {
             />
             <label htmlFor="image-upload" className="cursor-pointer">
               <div className="text-4xl mb-4">📸</div>
-              <p className="text-sage-700 mb-2">
+              <p className="text-green-700 dark:text-green-300 mb-2">
                 {selectedImage ? selectedImage.name : 'Click to upload textbook photo'}
               </p>
-              <p className="text-sm text-sage-500">
+              <p className="text-sm text-green-500 dark:text-green-400">
                 किताब का पेज अपलोड करें • Upload textbook page
               </p>
             </label>
@@ -123,7 +118,7 @@ const WorksheetGenerator = () => {
           <Button 
             onClick={handleGenerate}
             disabled={!selectedImage || !selectedGrade || isGenerating}
-            className="w-full sage-gradient text-white hover:opacity-90 transition-opacity"
+            className="w-full bg-green-500 hover:bg-green-600 text-white transition-colors"
           >
             {isGenerating ? '🔄 Worksheet बन रहा है... Creating Worksheet...' : '📝 Worksheet बनाएं • Generate Worksheet'}
           </Button>
@@ -131,27 +126,34 @@ const WorksheetGenerator = () => {
       </Card>
 
       {generatedWorksheet && (
-        <Card className="bg-white border-sage-200 shadow-lg">
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-sage-800 flex items-center space-x-2">
+            <CardTitle className="text-gray-800 dark:text-gray-200 flex items-center space-x-2">
               <span>📄</span>
               <span>Generated Worksheet • बना हुआ Worksheet</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm max-w-none">
-              <div className="whitespace-pre-line text-gray-700 leading-relaxed font-mono text-sm bg-gray-50 p-4 rounded-lg">
+              <div className="whitespace-pre-line text-gray-700 dark:text-gray-300 leading-relaxed font-mono text-sm bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 {generatedWorksheet}
               </div>
             </div>
-            <div className="mt-4 flex space-x-2">
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={handleCopy}>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600" 
+                onClick={handleCopy}
+              >
                 📋 Copy / कॉपी करें
               </Button>
-              <Button variant="outline" size="sm" className="text-sage-700 border-sage-300" onClick={() => window.print()}>
-                🖨️ Print / प्रिंट करें
-              </Button>
             </div>
+            <ContentDownloader 
+              content={generatedWorksheet}
+              filename={`worksheet-grade-${selectedGrade}-${Date.now()}`}
+              type="worksheet"
+            />
           </CardContent>
         </Card>
       )}

@@ -13,9 +13,11 @@ import VisualAidCreator from '@/components/VisualAidCreator';
 import AudioAssessment from '@/components/AudioAssessment';
 import LessonPlanner from '@/components/LessonPlanner';
 import Layout from '@/components/Layout';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [activeView, setActiveView] = useState<'home' | 'story' | 'qa' | 'worksheet' | 'visual' | 'audio' | 'lesson'>('home');
+  const { profile } = useAuth();
 
   const renderActiveView = () => {
     switch (activeView) {
@@ -36,6 +38,11 @@ const Index = () => {
     }
   };
 
+  // Get first name from full name
+  const getFirstName = (fullName: string) => {
+    return fullName.split(' ')[0];
+  };
+
   return (
     <Layout>
       {activeView !== 'home' && (
@@ -53,7 +60,9 @@ const Index = () => {
       {activeView === 'home' ? (
         <>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Hello, Ms. Priya!</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Hello, {profile ? getFirstName(profile.full_name) : 'Teacher'}!
+            </h1>
             <p className="text-gray-600 dark:text-gray-300">Welcome back to your teaching dashboard</p>
           </div>
 

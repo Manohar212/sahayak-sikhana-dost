@@ -1,169 +1,163 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import StudentProgress from '@/components/StudentProgress';
-import AIContentAssigner from '@/components/AIContentAssigner';
-import PersonalizedTips from '@/components/PersonalizedTips';
-import QuickActions from '@/components/QuickActions';
-import StoryGenerator from '@/components/StoryGenerator';
-import QASupport from '@/components/QASupport';
-import WorksheetGenerator from '@/components/WorksheetGenerator';
-import VisualAidCreator from '@/components/VisualAidCreator';
-import AudioAssessment from '@/components/AudioAssessment';
-import LessonPlanner from '@/components/LessonPlanner';
-import Layout from '@/components/Layout';
+import { BookOpen, Users, TrendingUp, FileText, Lightbulb, HelpCircle, PenTool, Eye } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
-  const [activeView, setActiveView] = useState<'home' | 'story' | 'qa' | 'worksheet' | 'visual' | 'audio' | 'lesson'>('home');
-  const { profile } = useAuth();
-
-  const renderActiveView = () => {
-    switch (activeView) {
-      case 'story':
-        return <StoryGenerator />;
-      case 'qa':
-        return <QASupport />;
-      case 'worksheet':
-        return <WorksheetGenerator />;
-      case 'visual':
-        return <VisualAidCreator />;
-      case 'audio':
-        return <AudioAssessment />;
-      case 'lesson':
-        return <LessonPlanner />;
-      default:
-        return null;
+  const { profile, user } = useAuth();
+  
+  const getUserName = () => {
+    if (profile?.full_name) {
+      // Extract first name from full name
+      return profile.full_name.split(' ')[0];
     }
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name.split(' ')[0];
+    }
+    if (user?.email) {
+      // Extract name from email if available
+      const emailName = user.email.split('@')[0];
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return 'Teacher';
   };
 
-  // Get first name from full name
-  const getFirstName = (fullName: string) => {
-    return fullName.split(' ')[0];
-  };
+  const tools = [
+    {
+      icon: BookOpen,
+      title: "Story Generator",
+      description: "Create engaging stories for your students based on curriculum topics",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50 dark:bg-blue-900/20"
+    },
+    {
+      icon: HelpCircle,
+      title: "Q&A Support",
+      description: "Get instant answers to curriculum questions and teaching doubts",
+      color: "text-green-600",
+      bgColor: "bg-green-50 dark:bg-green-900/20"
+    },
+    {
+      icon: PenTool,
+      title: "Worksheet Generator",
+      description: "Generate custom worksheets and practice materials",
+      color: "text-purple-600",
+      bgColor: "bg-purple-50 dark:bg-purple-900/20"
+    },
+    {
+      icon: FileText,
+      title: "Lesson Planner",
+      description: "Create detailed lesson plans aligned with your curriculum",
+      color: "text-orange-600",
+      bgColor: "bg-orange-50 dark:bg-orange-900/20"
+    },
+    {
+      icon: Eye,
+      title: "Visual Aid Creator",
+      description: "Generate visual aids and educational diagrams",
+      color: "text-pink-600",
+      bgColor: "bg-pink-50 dark:bg-pink-900/20"
+    },
+    {
+      icon: Lightbulb,
+      title: "Personalized Tips",
+      description: "Get AI-powered teaching tips and strategies",
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-50 dark:bg-yellow-900/20"
+    }
+  ];
 
   return (
-    <Layout>
-      {activeView !== 'home' && (
-        <div className="mb-6">
-          <Button 
-            onClick={() => setActiveView('home')}
-            variant="outline"
-            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            ← Back to Dashboard
-          </Button>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Navbar />
+      
+      <main className="container mx-auto px-4 py-8">
+        {/* Welcome Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Welcome back, {getUserName()}! 👋
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+            Your AI-powered teaching assistant is ready to help you create amazing learning experiences
+          </p>
         </div>
-      )}
 
-      {activeView === 'home' ? (
-        <>
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Hello, {profile ? getFirstName(profile.full_name) : 'Teacher'}!
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">Welcome back to your teaching dashboard</p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <StudentProgress />
-            <AIContentAssigner />
-            <PersonalizedTips />
-          </div>
-
-          <QuickActions />
-
-          <div className="mt-12">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">AI Teaching Tools</h2>
-              <Link to="/dashboard">
-                <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-white">
-                  View Analytics →
-                </Button>
-              </Link>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('story')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">📖</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Story Generator</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Create engaging stories in local languages</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('qa')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">🧠</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Q&A Support</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Get simple answers for student questions</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('worksheet')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">📝</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Worksheet Creator</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Generate worksheets from textbook photos</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('visual')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">🎨</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Visual Aid Creator</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Create simple drawings for blackboard</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('audio')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">🔊</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Audio Assessment</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Evaluate student reading fluency</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-
-              <div 
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all cursor-pointer group"
-                onClick={() => setActiveView('lesson')}
-              >
-                <div className="flex items-center space-x-3 mb-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">📋</span>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Lesson Planner</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Create structured lesson plans</p>
-                <div className="mt-3 text-xs text-green-600 dark:text-green-400 font-medium">✨ AI Powered</div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="max-w-4xl mx-auto">
-          {renderActiveView()}
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Assignments</CardTitle>
+              <FileText className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">12</div>
+              <p className="text-xs opacity-80">+2 from last week</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Students</CardTitle>
+              <Users className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">48</div>
+              <p className="text-xs opacity-80">Across all classes</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Average Progress</CardTitle>
+              <TrendingUp className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">85%</div>
+              <p className="text-xs opacity-80">+5% improvement</p>
+            </CardContent>
+          </Card>
         </div>
-      )}
-    </Layout>
+
+        {/* AI Tools Grid */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+            AI Teaching Tools
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tools.map((tool, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                <CardHeader>
+                  <div className={`w-12 h-12 rounded-lg ${tool.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <tool.icon className={`h-6 w-6 ${tool.color}`} />
+                  </div>
+                  <CardTitle className="text-lg">{tool.title}</CardTitle>
+                  <CardDescription>{tool.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white transition-colors">
+                    Try Now
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+          <div className="flex flex-wrap gap-3">
+            <Button size="sm" variant="outline">Create Assignment</Button>
+            <Button size="sm" variant="outline">Add Student</Button>
+            <Button size="sm" variant="outline">Generate Worksheet</Button>
+            <Button size="sm" variant="outline">Plan Lesson</Button>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 

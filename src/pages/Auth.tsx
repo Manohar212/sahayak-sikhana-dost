@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const Auth = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -20,6 +20,7 @@ const Auth = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -32,54 +33,119 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await signIn(loginData.email, loginData.password);
+    setIsLoading(true);
     
-    if (error) {
+    try {
+      const { error } = await signIn(loginData.email, loginData.password);
+      
+      if (error) {
+        console.error('Login error:', error);
+        
+        let errorMessage = "Login failed. Please check your credentials.";
+        
+        if (error.message?.includes('Email not confirmed')) {
+          errorMessage = "Please check your email and click the confirmation link before signing in.";
+        } else if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = "Invalid email or password. Please try again.";
+        } else if (error.message?.includes('rate limit')) {
+          errorMessage = "Too many attempts. Please wait a moment before trying again.";
+        }
+        
+        toast({
+          title: "Login Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
       toast({
-        title: "Login Failed",
-        description: error.message,
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    if (signupData.password !== signupData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      if (signupData.password !== signupData.confirmPassword) {
+        toast({
+          title: "Password Mismatch",
+          description: "Passwords do not match. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
-    const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
-    
-    if (error) {
+      if (signupData.password.length < 6) {
+        toast({
+          title: "Weak Password",
+          description: "Password must be at least 6 characters long.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
+      
+      if (error) {
+        console.error('Signup error:', error);
+        
+        let errorMessage = "Signup failed. Please try again.";
+        
+        if (error.message?.includes('User already registered')) {
+          errorMessage = "An account with this email already exists. Please sign in instead.";
+        } else if (error.message?.includes('rate limit')) {
+          errorMessage = "Please wait a moment before trying again.";
+        } else if (error.message?.includes('Password should be')) {
+          errorMessage = "Password should be at least 6 characters long.";
+        }
+        
+        toast({
+          title: "Signup Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Account Created!",
+          description: "Please check your email to verify your account before signing in.",
+        });
+        // Clear the form
+        setSignupData({ fullName: '', email: '', password: '', confirmPassword: '' });
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
       toast({
-        title: "Signup Failed",
-        description: error.message,
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Account Created!",
-        description: "Please check your email to verify your account.",
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading...</span>
+        </div>
       </div>
     );
   }
@@ -122,6 +188,7 @@ const Auth = () => {
                       onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                       placeholder="teacher@school.com"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="relative">
@@ -134,6 +201,7 @@ const Auth = () => {
                         onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                         placeholder="Enter your password"
                         required
+                        disabled={isLoading}
                       />
                       <Button
                         type="button"
@@ -141,13 +209,21 @@ const Auth = () => {
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">
-                    Sign In
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -173,6 +249,7 @@ const Auth = () => {
                       onChange={(e) => setSignupData({...signupData, fullName: e.target.value})}
                       placeholder="Ms. Priya Sharma"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div>
@@ -184,6 +261,7 @@ const Auth = () => {
                       onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                       placeholder="teacher@school.com"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="relative">
@@ -194,8 +272,10 @@ const Auth = () => {
                         type={showPassword ? "text" : "password"}
                         value={signupData.password}
                         onChange={(e) => setSignupData({...signupData, password: e.target.value})}
-                        placeholder="Create a strong password"
+                        placeholder="Create a strong password (min 6 characters)"
                         required
+                        minLength={6}
+                        disabled={isLoading}
                       />
                       <Button
                         type="button"
@@ -203,6 +283,7 @@ const Auth = () => {
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}
+                        disabled={isLoading}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
@@ -218,6 +299,7 @@ const Auth = () => {
                         onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
                         placeholder="Confirm your password"
                         required
+                        disabled={isLoading}
                       />
                       <Button
                         type="button"
@@ -225,13 +307,21 @@ const Auth = () => {
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        disabled={isLoading}
                       >
                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                   </div>
-                  <Button type="submit" className="w-full">
-                    Create Account
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
                   </Button>
                 </form>
               </CardContent>

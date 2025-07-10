@@ -1,12 +1,16 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Layout from '@/components/Layout';
+import AssignmentDetails from '@/components/AssignmentDetails';
 
 const Assignments = () => {
   const [filter, setFilter] = useState('all');
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
 
   const assignments = [
     {
@@ -18,7 +22,9 @@ const Assignments = () => {
       status: 'active',
       studentsCompleted: 18,
       totalStudents: 25,
-      type: 'worksheet'
+      type: 'worksheet',
+      description: 'Students will practice adding, subtracting, and comparing fractions using visual aids and real-world examples.',
+      instructions: 'Complete all 15 problems showing your work. Use fraction bars or circles to visualize your answers.'
     },
     {
       id: 2,
@@ -29,7 +35,9 @@ const Assignments = () => {
       status: 'draft',
       studentsCompleted: 0,
       totalStudents: 30,
-      type: 'story'
+      type: 'story',
+      description: 'Create a story explaining the process of photosynthesis from the perspective of a leaf.',
+      instructions: 'Write a 200-word story that includes the key terms: sunlight, carbon dioxide, water, glucose, and oxygen.'
     },
     {
       id: 3,
@@ -40,7 +48,9 @@ const Assignments = () => {
       status: 'completed',
       studentsCompleted: 22,
       totalStudents: 22,
-      type: 'worksheet'
+      type: 'worksheet',
+      description: 'Students will read a short passage and answer comprehension questions to test their understanding.',
+      instructions: 'Read the passage carefully twice, then answer all questions in complete sentences.'
     },
     {
       id: 4,
@@ -51,7 +61,35 @@ const Assignments = () => {
       status: 'active',
       studentsCompleted: 12,
       totalStudents: 28,
-      type: 'activity'
+      type: 'activity',
+      description: 'Interactive vocabulary exercise focusing on common Hindi words used in daily conversation.',
+      instructions: 'Learn 20 new Hindi words, write their meanings, and use each word in a sentence.'
+    },
+    {
+      id: 5,
+      title: 'Social Studies - Community Helpers',
+      grade: 'Grade 1',
+      subject: 'Social Studies',
+      dueDate: '2024-01-22',
+      status: 'active',
+      studentsCompleted: 5,
+      totalStudents: 20,
+      type: 'project',
+      description: 'Students will create a poster about different community helpers and their roles.',
+      instructions: 'Choose 5 community helpers, draw or paste pictures, and write 2 sentences about each helper.'
+    },
+    {
+      id: 6,
+      title: 'Mathematics - Multiplication Tables',
+      grade: 'Grade 4',
+      subject: 'Mathematics',
+      dueDate: '2024-01-25',
+      status: 'draft',
+      studentsCompleted: 0,
+      totalStudents: 26,
+      type: 'worksheet',
+      description: 'Practice multiplication tables from 2 to 10 with various problem types.',
+      instructions: 'Complete the multiplication chart and solve 50 multiplication problems.'
     }
   ];
 
@@ -73,8 +111,14 @@ const Assignments = () => {
       case 'worksheet': return '📝';
       case 'story': return '📖';
       case 'activity': return '🎯';
+      case 'project': return '🎨';
       default: return '📋';
     }
+  };
+
+  const handleViewDetails = (assignment: any) => {
+    setSelectedAssignment(assignment);
+    setShowDetails(true);
   };
 
   return (
@@ -113,7 +157,10 @@ const Assignments = () => {
                     <span className="text-2xl">{getTypeIcon(assignment.type)}</span>
                     <div>
                       <CardTitle className="text-lg">{assignment.title}</CardTitle>
-                      <div className="flex items-center space-x-2 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-2xl">
+                        {assignment.description}
+                      </p>
+                      <div className="flex items-center space-x-2 mt-2">
                         <Badge variant="outline">{assignment.grade}</Badge>
                         <Badge variant="outline">{assignment.subject}</Badge>
                         <Badge className={getStatusColor(assignment.status)}>
@@ -139,7 +186,13 @@ const Assignments = () => {
                     ></div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">View Details</Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(assignment)}
+                    >
+                      View Details
+                    </Button>
                     <Button variant="outline" size="sm">Edit</Button>
                   </div>
                 </div>
@@ -147,6 +200,12 @@ const Assignments = () => {
             </Card>
           ))}
         </div>
+
+        <AssignmentDetails
+          assignment={selectedAssignment}
+          isOpen={showDetails}
+          onClose={() => setShowDetails(false)}
+        />
       </div>
     </Layout>
   );

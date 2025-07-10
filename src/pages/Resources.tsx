@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Search, Download, Eye, BookOpen, FileText, Video, Headphones } from 'lucide-react';
 
 const Resources = () => {
@@ -21,7 +23,8 @@ const Resources = () => {
       downloads: 245,
       rating: 4.8,
       language: 'Hindi/English',
-      icon: <BookOpen className="h-5 w-5" />
+      icon: <BookOpen className="h-5 w-5" />,
+      pdfUrl: 'https://www.africau.edu/images/default/sample.pdf'
     },
     {
       id: 2,
@@ -33,34 +36,24 @@ const Resources = () => {
       downloads: 180,
       rating: 4.9,
       language: 'Telugu/English',
-      icon: <FileText className="h-5 w-5" />
+      icon: <FileText className="h-5 w-5" />,
+      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
     },
     {
       id: 3,
-      title: 'Pronunciation Practice Audio',
-      type: 'audio',
+      title: 'English Grammar Workbook',
+      type: 'worksheet',
       category: 'English',
-      grade: 'Grade 1-3',
-      description: 'Audio clips for correct English pronunciation practice',
-      downloads: 320,
+      grade: 'Grade 2-4',
+      description: 'Comprehensive English grammar exercises and activities',
+      downloads: 350,
       rating: 4.7,
       language: 'English',
-      icon: <Headphones className="h-5 w-5" />
+      icon: <FileText className="h-5 w-5" />,
+      pdfUrl: 'https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf'
     },
     {
       id: 4,
-      title: 'Simple Science Experiments Video',
-      type: 'video',
-      category: 'Science',
-      grade: 'Grade 2-4',
-      description: 'Easy-to-perform science experiments with household items',
-      downloads: 450,
-      rating: 4.9,
-      language: 'Hindi',
-      icon: <Video className="h-5 w-5" />
-    },
-    {
-      id: 5,
       title: 'Hindi Vowels Teaching Kit',
       type: 'worksheet',
       category: 'Hindi',
@@ -69,10 +62,11 @@ const Resources = () => {
       downloads: 290,
       rating: 4.6,
       language: 'Hindi',
-      icon: <FileText className="h-5 w-5" />
+      icon: <FileText className="h-5 w-5" />,
+      pdfUrl: 'https://www.africau.edu/images/default/sample.pdf'
     },
     {
-      id: 6,
+      id: 5,
       title: 'Math Problem Solving Strategies',
       type: 'guide',
       category: 'Mathematics',
@@ -81,7 +75,21 @@ const Resources = () => {
       downloads: 375,
       rating: 4.8,
       language: 'Marathi/English',
-      icon: <BookOpen className="h-5 w-5" />
+      icon: <BookOpen className="h-5 w-5" />,
+      pdfUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    },
+    {
+      id: 6,
+      title: 'Science Experiments Manual',
+      type: 'guide',
+      category: 'Science',
+      grade: 'Grade 3-5',
+      description: 'Safe and simple science experiments for primary school students',
+      downloads: 420,
+      rating: 4.9,
+      language: 'English/Hindi',
+      icon: <BookOpen className="h-5 w-5" />,
+      pdfUrl: 'https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf'
     }
   ];
 
@@ -103,6 +111,20 @@ const Resources = () => {
       case 'worksheet': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
+  };
+
+  const handleDownload = (resource: any) => {
+    const link = document.createElement('a');
+    link.href = resource.pdfUrl;
+    link.download = `${resource.title}.pdf`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePreview = (pdfUrl: string) => {
+    window.open(pdfUrl, '_blank');
   };
 
   return (
@@ -176,11 +198,21 @@ const Resources = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex space-x-2">
-                  <Button variant="default" size="sm" className="flex items-center space-x-1">
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="flex items-center space-x-1"
+                    onClick={() => handleDownload(resource)}
+                  >
                     <Download className="h-4 w-4" />
                     <span>Download</span>
                   </Button>
-                  <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center space-x-1"
+                    onClick={() => handlePreview(resource.pdfUrl)}
+                  >
                     <Eye className="h-4 w-4" />
                     <span>Preview</span>
                   </Button>

@@ -1,4 +1,3 @@
-
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Default API key for demo purposes - users should replace with their own
@@ -184,6 +183,38 @@ export const generateResourceData = async () => {
   Make it practical and culturally relevant.`;
 
   const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text();
+};
+
+export const generatePersonalizedTips = async (subject: string, grade: string, challenge: string) => {
+  if (!genAI) {
+    const initialized = initializeGemini();
+    if (!initialized) {
+      throw new Error('Gemini AI not initialized');
+    }
+  }
+
+  const model = genAI!.getGenerativeModel({ model: "gemini-pro" });
+  
+  const enhancedPrompt = `Generate personalized teaching tips for an Indian teacher facing specific challenges.
+
+  Subject: ${subject}
+  Grade Level: ${grade}
+  Challenge: ${challenge}
+  
+  Please provide:
+  - 5-7 practical, actionable teaching tips
+  - Solutions specific to Indian classroom context
+  - Low-cost or no-cost strategies
+  - Cultural sensitivity and local examples
+  - Tips in both Hindi and English where appropriate
+  - Real classroom scenarios and examples
+  - Easy-to-implement strategies
+  
+  Format the response with clear headings, bullet points, and practical examples that teachers can immediately use.`;
+
+  const result = await model.generateContent(enhancedPrompt);
   const response = await result.response;
   return response.text();
 };

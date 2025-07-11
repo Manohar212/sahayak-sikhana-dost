@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { generatePersonalizedTips } from '@/utils/geminiAI';
+import { generateAIContent } from '@/services/aiService';
 import { useToast } from '@/hooks/use-toast';
 import ContentDownloader from './ContentDownloader';
 
@@ -21,7 +21,7 @@ const PersonalizedTips = () => {
     setIsGenerating(true);
     
     try {
-      const tips = await generatePersonalizedTips(subject, grade, challenge);
+      const tips = await generateAIContent('tips', '', { subject, grade, challenge });
       setGeneratedTips(tips);
       toast({
         title: "Tips Ready! 💡",

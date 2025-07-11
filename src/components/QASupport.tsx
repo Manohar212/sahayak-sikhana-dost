@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { generateChildFriendlyAnswer } from '@/utils/geminiAI';
+import { generateAIContent } from '@/services/aiService';
 import { useToast } from '@/hooks/use-toast';
 import ContentDownloader from './ContentDownloader';
 
@@ -21,7 +21,7 @@ const QASupport = () => {
     setIsGenerating(true);
     
     try {
-      const answer = await generateChildFriendlyAnswer(question, language);
+      const answer = await generateAIContent('qa', question, { language });
       setGeneratedAnswer(answer);
       toast({
         title: "Answer Ready! 💡",

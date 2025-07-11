@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { generateStory } from '@/utils/geminiAI';
+import { generateAIContent } from '@/services/aiService';
 import { useToast } from '@/hooks/use-toast';
 import ContentDownloader from './ContentDownloader';
 
@@ -21,7 +21,7 @@ const StoryGenerator = () => {
     setIsGenerating(true);
     
     try {
-      const story = await generateStory(request, language);
+      const story = await generateAIContent('story', request, { language });
       setGeneratedStory(story);
       toast({
         title: "Story Created! 📖",

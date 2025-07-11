@@ -40,74 +40,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    const fetchProfile = async (userId: string) => {
-      try {
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle();
-        
-        if (error) {
-          console.error('Profile fetch error:', error);
-        } else if (profileData && isMounted) {
-          setProfile(profileData);
-        }
-      } catch (error) {
-        console.error('Error handling profile:', error);
-      }
-    };
-
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!isMounted) return;
         
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-        
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false); // Always set loading to false here
       }
     );
 
-    // Check for existing session
-    const initializeAuth = async () => {
+    // Check for existing session immediately
+    const checkSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Session error:', error);
-          if (isMounted) setLoading(false);
-          return;
-        }
-
-        console.log('Initial session check:', session?.user?.email);
-        
-        if (session?.user && isMounted) {
-          setSession(session);
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        }
+        const { data: { session } } = await supabase.auth.getSession();
         
         if (isMounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
           setLoading(false);
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
-        if (isMounted) setLoading(false);
+        console.error('Session check error:', error);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    initializeAuth();
+    checkSession();
 
     return () => {
       isMounted = false;

@@ -12,11 +12,12 @@ import WorksheetGenerator from '@/components/WorksheetGenerator';
 import LessonPlanner from '@/components/LessonPlanner';
 import VisualAidCreator from '@/components/VisualAidCreator';
 import PersonalizedTips from '@/components/PersonalizedTips';
-import { useSupabaseData } from '@/hooks/useSupabaseData';
+import { useAssignments, useStudents } from '@/hooks/useSupabaseData';
 
 const Index = () => {
   const { profile, user } = useAuth();
-  const { assignments, students } = useSupabaseData();
+  const { data: assignments } = useAssignments();
+  const { data: students } = useStudents();
   const [activeDialog, setActiveDialog] = useState<string>('');
   
   const getUserName = () => {

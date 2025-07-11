@@ -167,7 +167,7 @@ const PersonalizedTips = () => {
             <ContentDownloader 
               content={generatedTips}
               filename={`teaching-tips-${Date.now()}`}
-              type="tips"
+              type="lesson"
             />
           </CardContent>
         </Card>

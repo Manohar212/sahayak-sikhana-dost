@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import Layout from '@/components/Layout';
-import { generateDashboardData } from '@/utils/geminiAI';
+import { generateAIContent } from '@/services/aiService';
 import { useToast } from '@/hooks/use-toast';
+import QuickActions from '@/components/QuickActions';
 
 const Dashboard = () => {
   const [aiInsights, setAiInsights] = useState('');
@@ -37,7 +38,11 @@ const Dashboard = () => {
   const generateInsights = async () => {
     setIsLoading(true);
     try {
-      const insights = await generateDashboardData();
+      const insights = await generateAIContent('tips', '', {
+        subject: 'general teaching',
+        grade: 'all grades', 
+        challenge: 'student engagement and performance improvement'
+      });
       setAiInsights(insights);
       toast({
         title: "AI Insights Generated! 🤖",
@@ -92,6 +97,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         )}
+
+        <QuickActions />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border-blue-200">

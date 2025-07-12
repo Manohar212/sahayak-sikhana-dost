@@ -16,7 +16,7 @@ serve(async (req) => {
     const { prompt, type, language = 'Hindi', grade, subject, challenge } = await req.json();
 
     // Get Gemini API key from environment
-    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDXm3IFSpfxCfEMoZCXOubVwBx8rGxsEKI';
     if (!geminiApiKey) {
       throw new Error('Gemini API key not configured');
     }

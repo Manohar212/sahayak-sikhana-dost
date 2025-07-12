@@ -12,6 +12,7 @@ import WorksheetGenerator from '@/components/WorksheetGenerator';
 import LessonPlanner from '@/components/LessonPlanner';
 import VisualAidCreator from '@/components/VisualAidCreator';
 import PersonalizedTips from '@/components/PersonalizedTips';
+import QuickActions from '@/components/QuickActions';
 import { useAssignments, useStudents } from '@/hooks/useSupabaseData';
 
 const Index = () => {
@@ -229,64 +230,8 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Enhanced Quick Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center space-x-2">
-            <span>⚡</span>
-            <span>Quick Actions - Instant Teaching Tools</span>
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-blue-50 hover:border-blue-200"
-              onClick={() => handleQuickAction('create-assignment')}
-            >
-              <FileText className="h-5 w-5 text-blue-600" />
-              <span className="text-sm font-medium">Create Assignment</span>
-              <span className="text-xs text-gray-500">Quick setup</span>
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-green-50 hover:border-green-200"
-              onClick={() => handleQuickAction('add-student')}
-            >
-              <Users className="h-5 w-5 text-green-600" />
-              <span className="text-sm font-medium">Add Student</span>
-              <span className="text-xs text-gray-500">Register new</span>
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-purple-50 hover:border-purple-200"
-              onClick={() => handleQuickAction('generate-worksheet')}
-            >
-              <PenTool className="h-5 w-5 text-purple-600" />
-              <span className="text-sm font-medium">Generate Worksheet</span>
-              <span className="text-xs text-gray-500">AI powered</span>
-            </Button>
-            
-            <Button 
-              size="sm" 
-              variant="outline" 
-              className="h-auto p-4 flex flex-col items-center space-y-2 hover:bg-orange-50 hover:border-orange-200"
-              onClick={() => handleQuickAction('plan-lesson')}
-            >
-              <BookOpen className="h-5 w-5 text-orange-600" />
-              <span className="text-sm font-medium">Plan Lesson</span>
-              <span className="text-xs text-gray-500">Smart planning</span>
-            </Button>
-          </div>
-          
-          <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg">
-            <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-              💡 <strong>Pro Tip:</strong> All these tools are powered by AI and designed specifically for Indian curriculum and teaching methods.
-            </p>
-          </div>
-        </div>
+        {/* Working QuickActions Component */}
+        <QuickActions />
       </main>
     </div>
   );

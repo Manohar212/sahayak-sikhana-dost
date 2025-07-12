@@ -88,14 +88,15 @@ const Navbar = () => {
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setShowUserModal(true)}
-              className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            <Link to="/auth">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>

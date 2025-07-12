@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Default API key for demo purposes - users should replace with their own
-const DEFAULT_API_KEY = 'AIzaSyBmD4QlF8o8nO_2OAG9kqyR1HzXQo8N6Ts';
+// User's API key
+const DEFAULT_API_KEY = 'AIzaSyDXm3IFSpfxCfEMoZCXOubVwBx8rGxsEKI';
 
 let genAI: GoogleGenerativeAI | null = null;
 

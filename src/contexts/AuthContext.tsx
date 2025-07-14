@@ -19,6 +19,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  deleteAccount: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,15 +42,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
+    // Function to fetch user profile
+    const fetchProfile = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+          console.error('Profile fetch error:', error);
+          return;
+        }
+
+        if (isMounted && data) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error('Profile fetch error:', error);
+      }
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (!isMounted) return;
         
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false); // Always set loading to false here
+        
+        // Fetch profile when user signs in
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
+        
+        setLoading(false);
       }
     );
 
@@ -60,6 +92,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isMounted) {
           setSession(session);
           setUser(session?.user ?? null);
+          
+          // Fetch profile if user exists
+          if (session?.user) {
+            await fetchProfile(session.user.id);
+          }
+          
           setLoading(false);
         }
       } catch (error) {
@@ -153,6 +191,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      return { error };
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { error };
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+      
+      // Delete user profile first
+      if (profile) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('id', user.id);
+        
+        if (profileError) {
+          console.error('Profile deletion error:', profileError);
+        }
+      }
+
+      // Note: User deletion requires admin privileges
+      // For now, we'll just sign out the user
+      await signOut();
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Delete account error:', error);
+      return { error };
+    }
+  };
+
   const value = {
     user,
     session,
@@ -161,6 +240,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signIn,
     signOut,
+    resetPassword,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

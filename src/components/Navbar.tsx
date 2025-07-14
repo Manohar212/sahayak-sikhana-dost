@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Search, User, Sun, Moon, Download } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import UserModal from './UserModal';
 import SearchModal from './SearchModal';
 
 const Navbar = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { user, profile } = useAuth();
   const [showUserModal, setShowUserModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   
@@ -88,15 +90,27 @@ const Navbar = () => {
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </Button>
-            <Link to="/auth">
+            {user ? (
               <Button 
                 variant="ghost" 
                 size="icon"
+                onClick={() => setShowUserModal(true)}
                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                title={`Signed in as ${profile?.full_name || user.email}`}
               >
                 <User className="h-5 w-5" />
               </Button>
-            </Link>
+            ) : (
+              <Link to="/auth">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                >
+                  <User className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </nav>

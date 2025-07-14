@@ -15,8 +15,13 @@ serve(async (req) => {
   try {
     const { prompt, type, language = 'Hindi', grade, subject, challenge } = await req.json();
 
-    // Get Gemini API key from environment or use fallback
-    const geminiApiKey = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyDXm3IFSpfxCfEMoZCXOubVwBx8rGxsEKI';
+    // Get Gemini API key from environment
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    
+    if (!geminiApiKey) {
+      console.error('GEMINI_API_KEY not found in environment variables');
+      throw new Error('Gemini API key is not configured');
+    }
     
     console.log('API Key available:', !!geminiApiKey);
     console.log('Request data:', { type, language, grade, subject, challenge });

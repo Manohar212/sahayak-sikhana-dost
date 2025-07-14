@@ -11,6 +11,8 @@ export const generateAIContent = async (
   } = {}
 ) => {
   try {
+    console.log('Calling generate-ai-content with:', { type, prompt, options });
+    
     const { data, error } = await supabase.functions.invoke('generate-ai-content', {
       body: {
         prompt,
@@ -22,7 +24,17 @@ export const generateAIContent = async (
       },
     });
 
-    if (error) throw error;
+    console.log('Edge function response:', { data, error });
+
+    if (error) {
+      console.error('Edge function error:', error);
+      throw error;
+    }
+    
+    if (!data || !data.content) {
+      throw new Error('No content received from API');
+    }
+    
     return data.content;
   } catch (error) {
     console.error('AI content generation error:', error);

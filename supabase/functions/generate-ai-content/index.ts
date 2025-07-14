@@ -119,11 +119,21 @@ serve(async (req) => {
       }),
     });
 
+    console.log('Gemini API response status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Gemini API error response:', errorText);
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('Gemini API response data:', JSON.stringify(data, null, 2));
+    
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+      throw new Error('Invalid response structure from Gemini API');
+    }
+    
     const generatedText = data.candidates[0].content.parts[0].text;
 
     return new Response(JSON.stringify({ content: generatedText }), {

@@ -200,7 +200,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder={profile?.email || user.email || ''}
+                    placeholder="Enter your email address"
                     className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   />
                 </div>

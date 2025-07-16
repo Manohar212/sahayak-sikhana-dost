@@ -6,12 +6,18 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import Layout from '@/components/Layout';
 import { generateAIContent } from '@/services/aiService';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import QuickActions from '@/components/QuickActions';
 
 const Dashboard = () => {
   const [aiInsights, setAiInsights] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [totalAssignments, setTotalAssignments] = useState(0);
+  const [aiToolsUsed, setAiToolsUsed] = useState(0);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const studentData = [
     { grade: 'Grade 1', students: 25, avgScore: 78 },
@@ -34,6 +40,34 @@ const Dashboard = () => {
     { id: 3, activity: 'Answered student question about Solar System', time: '6 hours ago', type: 'qa' },
     { id: 4, activity: 'Generated visual aid for Fractions', time: '1 day ago', type: 'visual' },
   ];
+
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    
+    try {
+      // Fetch students count
+      const { count: studentsCount } = await supabase
+        .from('students')
+        .select('*', { count: 'exact', head: true })
+        .eq('teacher_id', user.id);
+      
+      // Fetch assignments count
+      const { count: assignmentsCount } = await supabase
+        .from('assignments')
+        .select('*', { count: 'exact', head: true })
+        .eq('created_by', user.id);
+      
+      setTotalStudents(studentsCount || 0);
+      setTotalAssignments(assignmentsCount || 0);
+      setAiToolsUsed(45); // Static for now, can be tracked separately
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [user]);
 
   const generateInsights = async () => {
     setIsLoading(true);
@@ -106,38 +140,38 @@ const Dashboard = () => {
               <CardTitle className="text-blue-800 dark:text-blue-200">Total Students</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">137</div>
-              <p className="text-sm text-blue-600 dark:text-blue-300">Across 5 grades</p>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{totalStudents}</div>
+              <p className="text-sm text-blue-600 dark:text-blue-300">Active students</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border-green-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-green-800 dark:text-green-200">AI Tools Used</CardTitle>
+              <CardTitle className="text-green-800 dark:text-green-200">Total Assignments</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-900 dark:text-green-100">45</div>
-              <p className="text-sm text-green-600 dark:text-green-300">This week</p>
+              <div className="text-3xl font-bold text-green-900 dark:text-green-100">{totalAssignments}</div>
+              <p className="text-sm text-green-600 dark:text-green-300">Created assignments</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 border-purple-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-purple-800 dark:text-purple-200">Avg Performance</CardTitle>
+              <CardTitle className="text-purple-800 dark:text-purple-200">AI Tools Used</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">82%</div>
-              <p className="text-sm text-purple-600 dark:text-purple-300">+5% from last month</p>
+              <div className="text-3xl font-bold text-purple-900 dark:text-purple-100">{aiToolsUsed}</div>
+              <p className="text-sm text-purple-600 dark:text-purple-300">This week</p>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 border-orange-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-orange-800 dark:text-orange-200">Content Created</CardTitle>
+              <CardTitle className="text-orange-800 dark:text-orange-200">Avg Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">23</div>
-              <p className="text-sm text-orange-600 dark:text-orange-300">Stories & worksheets</p>
+              <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">82%</div>
+              <p className="text-sm text-orange-600 dark:text-orange-300">Student average</p>
             </CardContent>
           </Card>
         </div>

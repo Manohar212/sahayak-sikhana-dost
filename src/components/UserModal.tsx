@@ -111,7 +111,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
     }
   };
 
-  if (!user || !profile) {
+  if (!user) {
     return null;
   }
 
@@ -146,7 +146,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                   <Input
                     id="profile-name"
                     type="text"
-                    value={profile.full_name}
+                    value={profile?.full_name || user.email || ''}
                     className="bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     readOnly
                   />
@@ -156,7 +156,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                   <Input
                     id="profile-email"
                     type="email"
-                    value={profile.email}
+                    value={profile?.email || user.email || ''}
                     className="bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     readOnly
                   />
@@ -165,7 +165,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                   <Label className="text-gray-700 dark:text-gray-300">Member Since</Label>
                   <Input
                     type="text"
-                    value={new Date(profile.created_at).toLocaleDateString()}
+                    value={profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Loading...'}
                     className="bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     readOnly
                   />
@@ -200,7 +200,7 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder={profile.email}
+                    placeholder={profile?.email || user.email || ''}
                     className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   />
                 </div>

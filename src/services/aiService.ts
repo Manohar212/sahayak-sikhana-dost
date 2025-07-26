@@ -17,7 +17,7 @@ export const generateAIContent = async (
       body: {
         prompt,
         type,
-        language: options.language || 'Hindi',
+        language: options.language || 'English',
         grade: options.grade,
         subject: options.subject,
         challenge: options.challenge,

@@ -12,6 +12,7 @@ import WorksheetGenerator from '@/components/WorksheetGenerator';
 import LessonPlanner from '@/components/LessonPlanner';
 import VisualAidCreator from '@/components/VisualAidCreator';
 import PersonalizedTips from '@/components/PersonalizedTips';
+import ImageGenerator from '@/components/ImageGenerator';
 import QuickActions from '@/components/QuickActions';
 import { useAssignments, useStudents } from '@/hooks/useSupabaseData';
 
@@ -106,6 +107,14 @@ const Index = () => {
       color: "text-yellow-600",
       bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
       component: "personalized-tips"
+    },
+    {
+      icon: Eye,
+      title: "Image Generator",
+      description: "Generate educational images and visual content for better student understanding",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50 dark:bg-indigo-900/20",
+      component: "image-generator"
     }
   ];
 
@@ -123,6 +132,8 @@ const Index = () => {
         return <VisualAidCreator />;
       case 'personalized-tips':
         return <PersonalizedTips />;
+      case 'image-generator':
+        return <ImageGenerator />;
       default:
         return <div>Component not found</div>;
     }
@@ -182,7 +193,7 @@ const Index = () => {
               <TrendingUp className="h-4 w-4" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">6</div>
+              <div className="text-2xl font-bold">7</div>
               <p className="text-xs opacity-80">Available AI assistants</p>
             </CardContent>
           </Card>

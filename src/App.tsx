@@ -31,12 +31,12 @@ const App = () => (
               <Route path="/" element={<Auth />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
-                  <Index />
+                  <Dashboard />
                 </ProtectedRoute>
               } />
               <Route path="/main" element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Index />
                 </ProtectedRoute>
               } />
               <Route path="/assignments" element={
